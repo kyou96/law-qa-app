@@ -58,6 +58,7 @@ st.markdown("""
 .tag-section { background: #2a2a3e; color: #cba6f7; }
 .tag-text    { background: #1e3448; color: #74c7ec; }
 .tag-kakomon { background: #3a2e1e; color: #fab387; }
+.tag-ronshо  { background: #2e1e3a; color: #cba6f7; }
 .progress-text { color: #a6adc8; font-size: 0.85rem; }
 div[data-testid="stButton"] > button { min-height: 48px; font-size: 1rem; }
 .stat-line { font-size: 0.88rem; color: #a6adc8; margin: 0; }
@@ -90,7 +91,7 @@ with st.sidebar:
     st.caption("司法試験・予備試験")
     st.divider()
 
-    selected_src = st.radio("出題ソース", ["すべて", "テキスト", "過去問"], horizontal=True)
+    selected_src = st.radio("出題ソース", ["すべて", "テキスト", "過去問", "論証"], horizontal=True)
     st.divider()
 
     # 章を数値順にソートするキー
@@ -182,7 +183,7 @@ current_num  = idx + 1
 prev_result  = results.get(card_id)
 
 # ─── ヘッダー ─────────────────────────────────────────────
-src_class = "tag-kakomon" if current_card["source"] == "過去問" else "tag-text"
+src_class = {"過去問": "tag-kakomon", "論証": "tag-ronshо"}.get(current_card["source"], "tag-text")
 col1, col2 = st.columns([3, 1])
 with col1:
     st.markdown(
@@ -237,6 +238,19 @@ else:
         f'<div class="card card-answer">A.&nbsp;{a_text}</div>',
         unsafe_allow_html=True
     )
+
+    # ─── 参照ページ & PDFリンク ────────────────────────────
+    ref_page = current_card.get("page")
+    pdf_url  = current_card.get("pdf_url")
+    if ref_page or pdf_url:
+        ref_col, pdf_col = st.columns([1, 1])
+        with ref_col:
+            if ref_page:
+                st.caption(f"参照: テキスト p.{ref_page}")
+        with pdf_col:
+            if pdf_url:
+                st.link_button("PDFで確認", pdf_url, use_container_width=True)
+
     col_ok, col_ng = st.columns(2)
     with col_ok:
         if st.button("✓ 覚えた", use_container_width=True, type="primary"):

@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import random
+import re
 from pathlib import Path
 
 st.set_page_config(page_title="司法試験 一問一答", page_icon="⚖️", layout="centered")
@@ -92,26 +93,34 @@ with st.sidebar:
     selected_src = st.radio("出題ソース", ["すべて", "テキスト", "過去問"], horizontal=True)
     st.divider()
 
-    # 章・セクション 階層ナビ
-    nav_labels = ["すべて"]
-    nav_values = [("すべて", "すべて")]
-    for ch in sorted(set(c["category"] for c in cards)):
-        nav_labels.append(ch)
-        nav_values.append((ch, "すべて"))
-        for s in sorted(set(
-            c["section"] for c in cards
-            if c["category"] == ch
-            and (selected_src == "すべて" or c["source"] == selected_src)
-        )):
-            nav_labels.append(f"　└ {s}")
-            nav_values.append((ch, s))
+    # 章を数値順にソートするキー
+    def ch_num(s):
+        m = re.search(r'第(\d+)章', s)
+        return int(m.group(1)) if m else 99
 
-    nav_idx = st.selectbox(
-        "章・セクション",
-        range(len(nav_labels)),
-        format_func=lambda i: nav_labels[i]
+    # ── 章セレクト（第1章〜第18章を数値順） ──
+    all_chapters = sorted(set(c["category"] for c in cards), key=ch_num)
+    ch_labels = ["すべて"] + [
+        f"{ch}　({sum(1 for c in cards if c['category']==ch and (selected_src=='すべて' or c['source']==selected_src))}問)"
+        for ch in all_chapters
+    ]
+    ch_values = ["すべて"] + all_chapters
+
+    ch_idx = st.selectbox(
+        "章",
+        range(len(ch_labels)),
+        format_func=lambda i: ch_labels[i]
     )
-    selected_cat, selected_sec = nav_values[nav_idx]
+    selected_cat = ch_values[ch_idx]
+
+    # ── セクションセレクト（選択章に絞って表示） ──
+    secs = sorted(set(
+        c["section"] for c in cards
+        if (selected_cat == "すべて" or c["category"] == selected_cat)
+        and (selected_src == "すべて" or c["source"] == selected_src)
+    ))
+    sec_labels = ["すべて"] + secs
+    selected_sec = st.selectbox("セクション", sec_labels)
     show_only_ng = st.checkbox("✗ のみ表示（苦手問題）")
     st.divider()
 

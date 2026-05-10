@@ -82,6 +82,8 @@ def init_session():
         if key not in st.session_state:
             st.session_state[key] = default
 
+PDF_URL = "https://drive.google.com/file/d/1Ms243AFokd5TvxCajn1tyrbKgcwT_bfR/view"
+
 cards = load_qa()
 init_session()
 
@@ -241,15 +243,12 @@ else:
 
     # ─── 参照ページ & PDFリンク ────────────────────────────
     ref_page = current_card.get("page")
-    pdf_url  = current_card.get("pdf_url")
-    if ref_page or pdf_url:
-        ref_col, pdf_col = st.columns([1, 1])
-        with ref_col:
-            if ref_page:
-                st.caption(f"参照: テキスト p.{ref_page}")
-        with pdf_col:
-            if pdf_url:
-                st.link_button("PDFで確認", pdf_url, use_container_width=True)
+    ref_col, pdf_col = st.columns([1, 1])
+    with ref_col:
+        if ref_page:
+            st.caption(f"参照: テキスト p.{ref_page}")
+    with pdf_col:
+        st.link_button("テキストPDFで確認", PDF_URL, use_container_width=True)
 
     col_ok, col_ng = st.columns(2)
     with col_ok:

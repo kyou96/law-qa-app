@@ -82,7 +82,32 @@ def init_session():
         if key not in st.session_state:
             st.session_state[key] = default
 
-PDF_URL = "https://drive.google.com/file/d/1Ms243AFokd5TvxCajn1tyrbKgcwT_bfR/view"
+_B = "https://drive.google.com/file/d/"
+CHAPTER_PDFS = {
+    "第1章":  [("テキストPDF", _B+"1FXPDeS4UUF4gWXsJB88jWmiDnow7Tv-b/view")],
+    "第2章":  [("テキストPDF", _B+"1boHo45ROZPbkd5UfVzQGi7UoPk62Pcv2/view")],
+    "第3章":  [("PDF 前半", _B+"11z2W9JbpjlC3udabS1dpsfNKw2WJFZi2/view"),
+               ("PDF 後半", _B+"1GGk3KkguSjg67sDE_PXPC9VD4EyjEubV/view")],
+    "第4章":  [("PDF 前半", _B+"1YWHODoxp8ZNk-i9bXhHs4ncjtI0AwRpF/view"),
+               ("PDF 後半", _B+"1ICTJfqsqT7AeHmSF7f2vI76eWJkXP5Ww/view")],
+    "第5章":  [("テキストPDF", _B+"1zc9TEWoZopzPsFvdhWzzAqjpfw-pRMkJ/view")],
+    "第6章":  [("テキストPDF", _B+"1tN0AKLNO8ueGjdIeFWbB0nLSb65cBDoy/view")],
+    "第7章":  [("テキストPDF", _B+"1BbH2ff-5BMei2wbZJaBtyjZvk6nbjzVB/view")],
+    "第8章":  [("テキストPDF", _B+"12PjmoU1JowzUMu1WHI3TZPBqfv0J6UwD/view")],
+    "第9章":  [("PDF 前半", _B+"13EpC5cnaqiTIFp7CTzacXqdojzEwuhNg/view"),
+               ("PDF 後半", _B+"1di1TQIKVasDFcJjlP9__1BELxOyhSMLg/view")],
+    "第10章": [("テキストPDF", _B+"1sCncDGabd9WIL9q7yh8896WASxyilm1g/view")],
+    "第11章": [("テキストPDF", _B+"12_wAPqZyf7BaXSuYEXI21bXKcONtvBS-/view")],
+    "第12章": [("PDF 前半", _B+"1tXH2eOX3f04miFsCxMpDP79tFV2ZBiZt/view"),
+               ("PDF 後半", _B+"1MYNxKJtVdy-56XuKR71MbQeD3HyUhjcQ/view")],
+    "第13章": [("テキストPDF", _B+"1TQTb3VAHyp_E2GWOccA387h5sq7YhRsB/view")],
+    "第14章": [("PDF 前半", _B+"1-Ws0EjtVo4aiZI_VneWMbguBo5d1_u9n/view"),
+               ("PDF 後半", _B+"13gSDG1CdjXOqdKVcB_5sQKHof-P47Idu/view")],
+    "第15章": [("テキストPDF", _B+"1bZ5VrqXdWAzies6h2lWhRSzkVrBEnjDR/view")],
+    "第16章": [("テキストPDF", _B+"1Mq6v7Hs5Ss_WIDWqaWbNRVPWOzvtKrLC/view")],
+    "第17章": [("テキストPDF", _B+"1xPN90MTew4FTxxHBAi2S6nuJpNMpQ_uQ/view")],
+    "第18章": [("テキストPDF", _B+"1Zo4u66ALD3in_CszYEy4O7IxGlH0HXlp/view")],
+}
 
 cards = load_qa()
 init_session()
@@ -251,12 +276,16 @@ else:
 
     # ─── 参照ページ & PDFリンク ────────────────────────────
     ref_page = current_card.get("page")
-    ref_col, pdf_col = st.columns([1, 1])
-    with ref_col:
-        if ref_page:
-            st.caption(f"参照: テキスト p.{ref_page}")
-    with pdf_col:
-        st.link_button("テキストPDFで確認", PDF_URL, use_container_width=True)
+    if ref_page:
+        st.caption(f"参照: テキスト p.{ref_page}")
+
+    ch_m = re.match(r'^(第\d+章)', current_card["category"])
+    pdf_links = CHAPTER_PDFS.get(ch_m.group(1) if ch_m else "", [])
+    if pdf_links:
+        pdf_cols = st.columns(len(pdf_links))
+        for i, (label, url) in enumerate(pdf_links):
+            with pdf_cols[i]:
+                st.link_button(label, url, use_container_width=True)
 
     col_ok, col_ng = st.columns(2)
     with col_ok:

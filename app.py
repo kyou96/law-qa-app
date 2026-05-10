@@ -136,15 +136,26 @@ with st.sidebar:
 
     st.divider()
 
-    categories = ["すべて"] + sorted(set(c["category"] for c in cards))
-    selected_cat = st.selectbox("カテゴリ", categories)
+    # 章・セクション 階層ナビ
+    nav_labels = ["すべて"]
+    nav_values = [("すべて", "すべて")]
+    for ch in sorted(set(c["category"] for c in cards)):
+        nav_labels.append(ch)
+        nav_values.append((ch, "すべて"))
+        for s in sorted(set(
+            c["section"] for c in cards
+            if c["category"] == ch
+            and (selected_src == "すべて" or c["source"] == selected_src)
+        )):
+            nav_labels.append(f"　└ {s}")
+            nav_values.append((ch, s))
 
-    sections = ["すべて"] + sorted(
-        set(c["section"] for c in cards
-            if (selected_cat == "すべて" or c["category"] == selected_cat)
-            and (selected_src == "すべて" or c["source"] == selected_src))
+    nav_idx = st.selectbox(
+        "章・セクション",
+        range(len(nav_labels)),
+        format_func=lambda i: nav_labels[i]
     )
-    selected_sec = st.selectbox("セクション", sections)
+    selected_cat, selected_sec = nav_values[nav_idx]
     show_only_ng = st.checkbox("✗ のみ表示（苦手問題）")
 
     st.divider()

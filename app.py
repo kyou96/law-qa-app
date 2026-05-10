@@ -7,6 +7,21 @@ st.set_page_config(page_title="司法試験 一問一答", page_icon="⚖️", l
 
 st.markdown("""
 <style>
+/* スマホ・タブレット対応 */
+@media (max-width: 768px) {
+    .card {
+        padding: 24px 16px !important;
+        font-size: 1rem !important;
+        min-height: 160px !important;
+    }
+    .tag {
+        font-size: 0.72rem !important;
+        padding: 2px 7px !important;
+    }
+    section[data-testid="stSidebar"] {
+        min-width: 80vw !important;
+    }
+}
 .card {
     background: #1e1e2e;
     border-radius: 16px;
@@ -17,10 +32,11 @@ st.markdown("""
     justify-content: center;
     text-align: center;
     font-size: 1.15rem;
-    line-height: 1.8;
+    line-height: 1.9;
     color: #cdd6f4;
     border: 1px solid #313244;
     margin: 16px 0;
+    word-break: break-word;
 }
 .card-answer {
     background: #1e3a2e;
@@ -38,6 +54,11 @@ st.markdown("""
 .progress-text {
     color: #a6adc8;
     font-size: 0.85rem;
+}
+/* ボタンをスマホで大きく */
+div[data-testid="stButton"] > button {
+    min-height: 48px;
+    font-size: 1rem;
 }
 </style>
 """, unsafe_allow_html=True)

@@ -101,8 +101,12 @@ with st.sidebar:
         m = re.search(r'第(\d+)章', s)
         return int(m.group(1)) if m else 99
 
-    # ── 章セレクト（第1章〜第18章を数値順） ──
-    all_chapters = sorted(set(c["category"] for c in cards), key=ch_num)
+    # ── 章セレクト（選択ソースに存在する章のみ・数値順） ──
+    all_chapters = sorted(
+        set(c["category"] for c in cards
+            if selected_src == "すべて" or c["source"] == selected_src),
+        key=ch_num
+    )
     ch_labels = ["すべて"] + [
         f"{ch}　({sum(1 for c in cards if c['category']==ch and (selected_src=='すべて' or c['source']==selected_src))}問)"
         for ch in all_chapters
@@ -112,7 +116,8 @@ with st.sidebar:
     ch_idx = st.selectbox(
         "章",
         range(len(ch_labels)),
-        format_func=lambda i: ch_labels[i]
+        format_func=lambda i: ch_labels[i],
+        key=f"ch_{selected_src}"   # ソース変更時に自動リセット
     )
     selected_cat = ch_values[ch_idx]
 
@@ -123,7 +128,10 @@ with st.sidebar:
         and (selected_src == "すべて" or c["source"] == selected_src)
     ))
     sec_labels = ["すべて"] + secs
-    selected_sec = st.selectbox("セクション", sec_labels)
+    selected_sec = st.selectbox(
+        "セクション", sec_labels,
+        key=f"sec_{selected_src}_{selected_cat}"  # 章変更時も自動リセット
+    )
     show_only_ng = st.checkbox("✗ のみ表示（苦手問題）")
     st.divider()
 
